@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="welcome-header text-center mb-4">
+            <h1 class="display-4"><i class="bi bi-journal-richtext text-primary"></i> YourDiary</h1>
+            <p class="lead">Your Personal AI-Powered Writing Assistant</p>
+        </div>
+
+        <div class="card diary-card">
+            <div class="card-header">
+                <h4><i class="bi bi-magic"></i> Smart Writing Assistant</h4>
+                <small class="text-muted">AI-powered suggestions with personalized LSTM learning</small>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Suggestion Length</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="suggestionLength" id="length20" value="20" checked>
+                        <label class="btn btn-outline-primary" for="length20">Short (20)</label>
+
+                        <input type="radio" class="btn-check" name="suggestionLength" id="length30" value="30">
+                        <label class="btn btn-outline-primary" for="length30">Medium (30)</label>
+
+                        <input type="radio" class="btn-check" name="suggestionLength" id="lengthSentence" value="sentence">
+                        <label class="btn btn-outline-primary" for="lengthSentence">Complete Sentence</label>
+
+                        <input type="radio" class="btn-check" name="suggestionLength" id="lengthCustom" value="custom">
+                        <label class="btn btn-outline-primary" for="lengthCustom">Custom</label>
+                    </div>
+                </div>
+
+                <div class="mb-3" id="customLengthContainer" style="display: none;">
+                    <label for="customLength" class="form-label">Custom Length (10-100 characters)</label>
+                    <input type="range" class="form-range" id="customLength" min="10" max="100" value="25">
+                    <small class="text-muted">Length: <span id="customLengthValue">25</span> characters</small>
+                </div>
+
+                <div class="mb-3 position-relative">
+                    <label for="messageInput" class="form-label">Write your thoughts, tasks, or diary entries:</label>
+                    <textarea id="messageInput" class="form-control diary-textarea" rows="6" 
+                              placeholder="Dear diary... Start writing and watch AI suggestions appear above!"></textarea>
+                    <div id="suggestions" class="suggestion-box" style="display: none;"></div>
+                    <div class="form-text">
+                        <i class="bi bi-lightbulb"></i> Your personal LSTM model learns your writing style and improves suggestions over time
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mb-3 flex-wrap">
+                    <button id="sendBtn" class="btn btn-primary">
+                        <i class="bi bi-journal-plus"></i> Save Entry
+                    </button>
+                    <button id="addTaskBtn" class="btn btn-success">
+                        <i class="bi bi-check2-square"></i> Add as Task
+                    </button>
+                    <button id="clearBtn" class="btn btn-outline-secondary">
+                        <i class="bi bi-trash"></i> Clear
+                    </button>
+                    <button id="refreshSuggestionsBtn" class="btn btn-outline-info">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh AI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card feature-card">
+                    <div class="card-body">
+                        <h6><i class="bi bi-brain text-primary"></i> AI Learning Features:</h6>
+                        <ul class="mb-0 small">
+                            <li>✅ Personal LSTM neural network</li>
+                            <li>🧠 Learns your writing style</li>
+                            <li>📝 Real-time smart suggestions</li>
+                            <li>⚙️ Customizable suggestion lengths</li>
+                            <li>🎯 Improves with each entry</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card feature-card">
+                    <div class="card-body">
+                        <h6><i class="bi bi-list-check text-success"></i> Diary & Tasks:</h6>
+                        <ul class="mb-0 small">
+                            <li>📖 Personal diary entries</li>
+                            <li>✅ Task management system</li>
+                            <li>🏷️ Priority levels & due dates</li>
+                            <li>📊 Progress tracking</li>
+                            <li>🔄 Convert entries to tasks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="taskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-check2-square"></i> Create New Task
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <div class="mb-3">
+                        <label class="form-label">Task Title</label>
+                        <input type="text" id="taskTitle" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea id="taskDescription" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select id="taskPriority" class="form-control">
+                            <option value="low">🟢 Low Priority</option>
+                            <option value="medium" selected>🟡 Medium Priority</option>
+                            <option value="high">🔴 High Priority</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" id="taskDueDate" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="saveTaskBtn" class="btn btn-success">
+                    <i class="bi bi-save"></i> Create Task
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

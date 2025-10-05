@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2><i class="bi bi-list-task text-success"></i> My Tasks</h2>
+                <p class="text-muted mb-0">Organize your life with AI-enhanced task management</p>
+            </div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTaskModal">
+                <i class="bi bi-plus-circle"></i> Add Task
+            </button>
+        </div>
+
+        <!-- Task Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stats-card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <i class="bi bi-list-ul display-6"></i>
+                        <h3 class="mt-2">{{ stats.total }}</h3>
+                        <small>Total Tasks</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <i class="bi bi-clock display-6"></i>
+                        <h3 class="mt-2">{{ stats.pending }}</h3>
+                        <small>Pending</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="bi bi-check-circle display-6"></i>
+                        <h3 class="mt-2">{{ stats.completed }}</h3>
+                        <small>Completed</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <i class="bi bi-exclamation-triangle display-6"></i>
+                        <h3 class="mt-2">{{ stats.overdue }}</h3>
+                        <small>Overdue</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks List -->
+        {% if tasks %}
+            <div class="tasks-container">
+                {% for task in tasks %}
+                <div class="card task-card mb-3" data-task-id="{{ task.id }}">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-1">
+                                <div class="form-check">
+                                    <input class="form-check-input task-checkbox" type="checkbox" 
+                                           {% if task.status == 'completed' %}checked{% endif %}
+                                           data-task-id="{{ task.id }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="mb-1 task-title {% if task.status == 'completed' %}text-decoration-line-through text-muted{% endif %}">
+                                    {{ task.title }}
+                                </h5>
+                                {% if task.description %}
+                                    <p class="mb-2 text-muted task-description">{{ task.description }}</p>
+                                {% endif %}
+                                <small class="text-muted task-meta">
+                                    <i class="bi bi-calendar-plus"></i> Created: {{ task.created_at }}
+                                    {% if task.due_date %}
+                                        | <i class="bi bi-alarm"></i> Due: {{ task.due_date }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div class="col-md-2">
+                                <span class="badge priority-{{ task.priority }}">
+                                    {% if task.priority == 'high' %}🔴 High
+                                    {% elif task.priority == 'medium' %}🟡 Medium
+                                    {% else %}🟢 Low{% endif %}
+                                </span>
+                            </div>
+                            <div class="col-md-2">
+                                <span class="badge task-status {% if task.status == 'completed' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                    {% if task.status == 'completed' %}
+                                        <i class="bi bi-check-circle"></i> Complete
+                                    {% else %}
+                                        <i class="bi bi-clock"></i> Pending
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item delete-task" href="#" data-task-id="{{ task.id }}">
+                                            <i class="bi bi-trash text-danger"></i> Delete
+                                        </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5 empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-list-task display-1 text-muted"></i>
+                </div>
+                <h4 class="mt-3 text-muted">No tasks yet</h4>
+                <p class="text-muted">
+                    Create your first task or convert a diary entry into a task to get started!
+                </p>
+                <div class="mt-4">
+                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newTaskModal">
+                        <i class="bi bi-plus-circle"></i> Create Task
+                    </button>
+                    <a href="{{ url_for('diary') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-journal-bookmark"></i> View Diary
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- New Task Modal -->
+<div class="modal fade" id="newTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-square"></i> Create New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newTaskForm">
+                    <div class="mb-3">
+                        <label class="form-label">Task Title</label>
+                        <input type="text" id="newTaskTitle" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea id="newTaskDescription" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select id="newTaskPriority" class="form-control">
+                            <option value="low">🟢 Low Priority</option>
+                            <option value="medium" selected>🟡 Medium Priority</option>
+                            <option value="high">🔴 High Priority</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" id="newTaskDueDate" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="saveNewTaskBtn" class="btn btn-success">
+                    <i class="bi bi-save"></i> Create Task
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

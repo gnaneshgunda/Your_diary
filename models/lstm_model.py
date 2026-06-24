@@ -231,7 +231,7 @@ class LSTM:
         return total_loss / sequences_trained if sequences_trained > 0 else 0
 
     def save_weights(self, filename):
-        """Save weights - EXACT MATCH"""
+        """Save weights to .npz file."""
         try:
             np.savez(filename,
                      W_i=self.W_i, W_f=self.W_f, W_c=self.W_c, W_o=self.W_o, W_hy=self.W_hy,
@@ -241,7 +241,7 @@ class LSTM:
             print(f"YourDiary Error saving weights: {e}")
 
     def load_weights(self, filename):
-        """Load weights - EXACT MATCH"""
+        """Load weights from .npz file."""
         try:
             data = np.load(filename, allow_pickle=True)
             self.W_i = data['W_i']; self.W_f = data['W_f']; self.W_c = data['W_c']; self.W_o = data['W_o']
@@ -250,6 +250,27 @@ class LSTM:
             self.h = data['h']; self.c = data['c']
         except Exception as e:
             print(f"YourDiary Error loading weights: {e}")
+
+    def save_weights_to_bytes(self) -> bytes:
+        """Serialize all weights to an in-memory npz binary blob."""
+        import io
+        buf = io.BytesIO()
+        np.savez(buf,
+                 W_i=self.W_i, W_f=self.W_f, W_c=self.W_c, W_o=self.W_o, W_hy=self.W_hy,
+                 b_i=self.b_i, b_f=self.b_f, b_c=self.b_c, b_o=self.b_o, b_y=self.b_y,
+                 h=self.h, c=self.c)
+        return buf.getvalue()
+
+    def load_weights_from_bytes(self, data: bytes):
+        """Restore weights from an in-memory npz binary blob."""
+        import io
+        buf = io.BytesIO(data)
+        npz = np.load(buf, allow_pickle=True)
+        self.W_i = npz['W_i']; self.W_f = npz['W_f']; self.W_c = npz['W_c']; self.W_o = npz['W_o']
+        self.W_hy = npz['W_hy']; self.b_i = npz['b_i']; self.b_f = npz['b_f']
+        self.b_c = npz['b_c']; self.b_o = npz['b_o']; self.b_y = npz['b_y']
+        self.h = npz['h']; self.c = npz['c']
+
 
     def get_completions(self, text, num_suggestions=3, max_length=20):
         """Generate diary writing suggestions using your trained model"""
@@ -413,11 +434,10 @@ class LSTM:
 class LSTMModelManager:
     def __init__(self):
         self.base_model = None
-        self.user_models = {}
+        self.user_models = {}  # in-memory cache: {user_id: LSTM}
 
     def load_base_model(self):
-        """Load or create YourDiary base model with EXACT MATCHING SETUP"""
-        # Use hidden_size=128 to match your training!
+        """Load or create base LSTM model from pre-trained weights."""
         self.base_model = LSTM(voc, hidden_size=128)
 
         if os.path.exists("base_model.npz"):
@@ -426,64 +446,122 @@ class LSTMModelManager:
                 print("✅ YourDiary AI: Base model loaded successfully")
             except Exception as e:
                 print(f"⚠️ YourDiary AI: Error loading base model: {e}")
-                print("ℹ️ Using fresh AI weights - will learn from your writing!")
+                print("ℹ️  Using fresh AI weights — will learn from your writing!")
         else:
-            print("ℹ️ YourDiary AI: Initializing fresh neural network")
-            print("💡 Your AI will start learning immediately from your first entries!")
+            print("ℹ️  YourDiary AI: No base_model.npz found — using fresh weights")
 
     def get_user_model(self, user_id):
-        """Get or create user-specific YourDiary AI model"""
+        """
+        Return the in-memory model for user_id.
+        On first access, loading priority is:
+          1. Database (BLOB/BYTEA)  — works on Render/production
+          2. Filesystem (.npz file) — local dev fallback
+          3. Base model copy        — brand new user
+        """
         if user_id not in self.user_models:
-            # Use hidden_size=128 to match your training!
             self.user_models[user_id] = LSTM(voc, hidden_size=128)
-            user_path = f"yourdiary_users/user_{user_id}.npz"
+            loaded = False
 
-            if os.path.exists(user_path):
-                try:
-                    self.user_models[user_id].load_weights(user_path)
-                    print(f"✅ YourDiary AI: Personal model loaded for user {user_id}")
-                except Exception as e:
-                    print(f"⚠️ YourDiary AI: Error loading user model: {e}")
-                    self.copy_base_to_user(user_id)
-            else:
+            # ── 1. Try database storage ────────────────────────────────────────
+            try:
+                from models.database import load_user_model_weights
+                weights_bytes, entry_count = load_user_model_weights(user_id)
+                if weights_bytes:
+                    self.user_models[user_id].load_weights_from_bytes(weights_bytes)
+                    print(f"✅ YourDiary AI: Personal model loaded from DB for user {user_id} "
+                          f"(trained on {entry_count} entries)")
+                    loaded = True
+            except Exception as e:
+                print(f"⚠️ YourDiary AI: DB model load failed for user {user_id}: {e}")
+
+            # ── 2. Fallback: filesystem .npz ───────────────────────────────────
+            if not loaded:
+                user_path = f"yourdiary_users/user_{user_id}.npz"
+                if os.path.exists(user_path):
+                    try:
+                        self.user_models[user_id].load_weights(user_path)
+                        print(f"✅ YourDiary AI: Personal model loaded from file for user {user_id}")
+                        loaded = True
+                    except Exception as e:
+                        print(f"⚠️ YourDiary AI: File model load failed for user {user_id}: {e}")
+
+            # ── 3. Fallback: copy base model ───────────────────────────────────
+            if not loaded:
                 self.copy_base_to_user(user_id)
 
         return self.user_models[user_id]
 
     def copy_base_to_user(self, user_id):
-        """Initialize user model with base weights"""
+        """Initialize a user's model by copying base model weights."""
         if self.base_model and user_id in self.user_models:
             try:
-                user_model = self.user_models[user_id]
-                user_model.W_i = self.base_model.W_i.copy()
-                user_model.W_f = self.base_model.W_f.copy()
-                user_model.W_c = self.base_model.W_c.copy()
-                user_model.W_o = self.base_model.W_o.copy()
-                user_model.W_hy = self.base_model.W_hy.copy()
-                user_model.b_i = self.base_model.b_i.copy()
-                user_model.b_f = self.base_model.b_f.copy()
-                user_model.b_c = self.base_model.b_c.copy()
-                user_model.b_o = self.base_model.b_o.copy()
-                user_model.b_y = self.base_model.b_y.copy()
-                print(f"📋 YourDiary AI: Personal assistant initialized for user {user_id}")
+                m = self.user_models[user_id]
+                m.W_i  = self.base_model.W_i.copy()
+                m.W_f  = self.base_model.W_f.copy()
+                m.W_c  = self.base_model.W_c.copy()
+                m.W_o  = self.base_model.W_o.copy()
+                m.W_hy = self.base_model.W_hy.copy()
+                m.b_i  = self.base_model.b_i.copy()
+                m.b_f  = self.base_model.b_f.copy()
+                m.b_c  = self.base_model.b_c.copy()
+                m.b_o  = self.base_model.b_o.copy()
+                m.b_y  = self.base_model.b_y.copy()
+                print(f"📋 YourDiary AI: Base model copied to new user {user_id}")
             except Exception as e:
-                print(f"⚠️ YourDiary AI: Error initializing user model: {e}")
+                print(f"⚠️ YourDiary AI: Error copying base model: {e}")
 
     def train_user_model_background(self, user_id, diary_entries):
-        """Train personal YourDiary AI on user's writing"""
+        """
+        Background training loop — called in a daemon thread every 3 diary entries.
+
+        Flow:
+          1. Run LSTM incremental training on recent diary text
+          2. Save updated weights → database  (persists across Render redeploys)
+          3. Save updated weights → filesystem (local dev convenience)
+        """
         try:
-            print(f"🎯 YourDiary AI: Learning from user {user_id}'s writing style")
+            print(f"🎯 YourDiary AI: Training personalized model for user {user_id}")
             user_model = self.get_user_model(user_id)
             training_text = " ".join(diary_entries)
 
-            if len(training_text) > 25:
-                loss = user_model.train_incremental(training_text, seq_length=25, learning_rate=0.005)
-                print(f"📊 YourDiary AI: Learning progress - loss: {loss:.4f}")
+            if len(training_text) < 25:
+                print(f"⏭️  YourDiary AI: Not enough text to train user {user_id} yet")
+                return
 
+            # ── LSTM incremental training ──────────────────────────────────────
+            loss = user_model.train_incremental(
+                training_text, seq_length=25, learning_rate=0.005
+            )
+            print(f"📊 YourDiary AI: User {user_id} training loss = {loss:.4f}")
+
+            # Count total entries for tracking
+            try:
+                from models.database import get_user_messages
+                entry_count = len(get_user_messages(user_id))
+            except Exception:
+                entry_count = len(diary_entries)
+
+            # ── 1. Save to database (primary — survives redeploys) ─────────────
+            try:
+                from models.database import save_user_model_weights
+                weights_bytes = user_model.save_weights_to_bytes()
+                if save_user_model_weights(user_id, weights_bytes, entry_count):
+                    print(f"💾 YourDiary AI: Weights saved to DB for user {user_id} "
+                          f"({len(weights_bytes):,} bytes, {entry_count} entries)")
+                else:
+                    print(f"⚠️  YourDiary AI: Failed to save weights to DB for user {user_id}")
+            except Exception as e:
+                print(f"⚠️  YourDiary AI: DB save error for user {user_id}: {e}")
+
+            # ── 2. Save to filesystem (fallback for local dev) ─────────────────
+            try:
                 os.makedirs("yourdiary_users", exist_ok=True)
                 user_model.save_weights(f"yourdiary_users/user_{user_id}.npz")
-                print(f"💾 YourDiary AI: Personal model saved for user {user_id}")
-                print(f"🎉 Your AI assistant is getting smarter with your writing style!")
+                print(f"💾 YourDiary AI: Weights also saved to filesystem for user {user_id}")
+            except Exception as e:
+                print(f"⚠️  YourDiary AI: Filesystem save error: {e}")
+
+            print(f"🎉 YourDiary AI: User {user_id}'s personal model updated successfully!")
 
         except Exception as e:
             print(f"❌ YourDiary AI: Training error for user {user_id}: {e}")

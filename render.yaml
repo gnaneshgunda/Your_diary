@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: yourdiary-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true          # Render auto-generates a secure random value
+      - key: ALLOWED_ORIGINS
+        value: https://your-app.vercel.app   # Replace with your actual Vercel URL
+      - key: DATABASE_URL
+        value: ""                    # Paste your Supabase / Neon / Railway PostgreSQL URL here
+      - key: PYTHON_VERSION
+        value: 3.11.0

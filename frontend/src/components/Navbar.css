@@ -1,0 +1,105 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15, 10, 30, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  padding: 0 1.5rem;
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.navbar-brand:hover { opacity: 0.85; }
+
+.brand-icon { font-size: 1.4rem; }
+.brand-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #c4b5fd, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.nav-link {
+  color: rgba(203, 213, 225, 0.8);
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.nav-link:hover {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.12);
+}
+.nav-link.active {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.18);
+}
+
+.nav-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(139, 92, 246, 0.3);
+  margin: 0 0.5rem;
+}
+
+.nav-user {
+  font-size: 0.85rem;
+  color: rgba(148, 163, 184, 0.8);
+  padding: 0 0.5rem;
+}
+
+.nav-logout {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-logout:hover {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.nav-btn {
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  color: white !important;
+  text-decoration: none;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.nav-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+}

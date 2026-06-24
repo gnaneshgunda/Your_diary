@@ -1,195 +1,419 @@
-# 📖 YourDiary - AI-Powered Personal Writing Assistant
+# 📖 YourDiary — AI-Powered Personal Diary
 
-**Your Personal Digital Journal with Smart AI Suggestions**
+> A modern full-stack journaling app with a personal LSTM neural network that learns your unique writing style.
 
-YourDiary combines the intimacy of traditional journaling with cutting-edge AI technology to help you express your thoughts, manage tasks, and build meaningful writing habits.
-
-## 🌟 What Makes YourDiary Special
-
-### 🧠 Personal AI Assistant
-- **LSTM Neural Network** learns your unique writing style
-- **Smart Suggestions** that get better with every entry
-- **Customizable Length** - short phrases to complete sentences
-- **Real-time Learning** - AI trains on your personal writing
-
-### 📝 Beautiful Diary Experience  
-- **Clean, Modern Interface** designed for distraction-free writing
-- **Diary Timeline** to revisit your memories and growth
-- **Writing Prompts** through AI suggestions
-- **Personal Space** - your thoughts, your way
-
-### ✅ Integrated Task Management
-- **Convert Entries to Tasks** - turn thoughts into actions
-- **Priority Levels** - organize by importance
-- **Due Date Tracking** - never miss important deadlines
-- **Progress Statistics** - see your productivity at a glance
-
-## 🚀 Quick Start Guide
-
-### Installation
-1. **Download and extract** `YourDiary_complete.zip`
-2. **Install Python dependencies:**
-   ```bash
-   pip install flask numpy werkzeug
-   ```
-3. **Launch YourDiary:**
-   ```bash
-   python app.py
-   ```
-4. **Open your browser:** http://localhost:5000
-
-### First Steps
-1. **Create your account** - choose a username and secure password
-2. **Start writing** - type your first diary entry
-3. **Watch AI learn** - see suggestions improve with each entry
-4. **Organize your life** - convert entries to tasks as needed
-
-## 🎯 Key Features
-
-### Smart Writing Assistant
-- **Instant Suggestions** - AI helps complete your thoughts
-- **Multiple Length Options:**
-  - Short (20 characters) - quick word completions
-  - Medium (30 characters) - phrase suggestions  
-  - Complete Sentences - natural sentence endings
-  - Custom Length - slider control (10-100 characters)
-- **Context Awareness** - suggestions match your writing style
-- **Temperature-based Generation** - creative yet relevant suggestions
-
-### Personal Growth Tracking
-- **Writing History** - see all your entries chronologically
-- **AI Learning Progress** - model improves every 3 entries
-- **Memory Lane** - revisit past thoughts and experiences
-- **Export Options** - copy entries for external use
-
-### Task & Life Management
-- **Seamless Integration** - diary entries become actionable tasks
-- **Visual Priority System** - color-coded importance levels
-- **Statistics Dashboard** - track completion rates
-- **Due Date Management** - never forget important deadlines
-
-## 🧠 How the AI Works
-
-### Neural Network Architecture
-- **LSTM (Long Short-Term Memory)** - perfect for sequential text
-- **Character-level Processing** - understands writing patterns
-- **Personal Model** - each user gets their own AI assistant
-- **Continuous Learning** - improves with every entry
-
-### Training Process
-```
-Your Writing → LSTM Processing → Pattern Recognition → Better Suggestions
-     ↓                                                         ↑
-Save Entry → Background Training (every 3 entries) → Updated Model
-```
-
-### Privacy & Security
-- **Personal Models** - your AI never shares data with other users
-- **Local Storage** - all data stays on your server
-- **Encrypted Passwords** - secure authentication system
-- **No External APIs** - your diary remains private
-
-## 📱 User Interface
-
-### Writing Experience
-- **Distraction-free Editor** - focus on your thoughts
-- **Suggestion Overlay** - helpful without being intrusive  
-- **Keyboard Shortcuts** - Ctrl+Enter to save quickly
-- **Responsive Design** - works on desktop, tablet, mobile
-
-### Navigation
-- **Smart Writing** - main entry interface
-- **My Diary** - chronological view of all entries
-- **Tasks** - integrated task management
-- **Entries** - detailed view for AI training
-
-## 🛠️ Technical Details
-
-### Requirements
-- **Python 3.7+**
-- **Flask web framework**
-- **NumPy for neural networks**
-- **Modern web browser**
-
-### File Structure
-```
-YourDiary/
-├── app.py                 # Main Flask application
-├── yourdiary.db          # SQLite database (auto-created)
-├── models/
-│   ├── lstm_model.py     # AI neural network
-│   └── database.py       # Data management
-├── templates/            # HTML templates
-├── static/              # CSS, JavaScript, assets
-└── yourdiary_users/     # Personal AI models (auto-created)
-```
-
-### Database Schema
-- **Users** - account management
-- **Diary Entries** - your writing history  
-- **Tasks** - integrated task management
-- **AI Models** - stored as .npz files
-
-## 🎨 Customization
-
-### Appearance
-- **Modern Gradient Design** - beautiful purple/blue theme
-- **Responsive Layout** - adapts to any screen size
-- **Bootstrap 5** - professional, polished interface
-- **Custom Animations** - smooth, engaging interactions
-
-### AI Behavior
-- **Suggestion Length** - adjust to your preference
-- **Learning Rate** - how fast AI adapts (default: optimal)
-- **Temperature** - creativity vs consistency balance
-- **Training Frequency** - currently every 3 entries
-
-## 🔒 Privacy & Ethics
-
-### Data Privacy
-- **No Cloud Storage** - everything stays local
-- **Personal AI Models** - never shared between users
-- **Encrypted Passwords** - secure authentication
-- **No Tracking** - your privacy is paramount
-
-### Ethical AI
-- **Transparent Learning** - you know when AI is training
-- **User Control** - you decide what to write
-- **No Bias Injection** - AI only learns from your writing
-- **Respectful Suggestions** - AI maintains your voice
-
-## 🎉 Perfect For
-
-### Personal Journaling
-- **Daily Reflections** - capture your thoughts and feelings
-- **Memory Keeping** - preserve important moments
-- **Creative Writing** - overcome writer's block with AI help
-- **Self-Discovery** - explore your inner world
-
-### Productivity
-- **Thought Organization** - turn ideas into actionable items
-- **Goal Tracking** - monitor progress over time
-- **Time Management** - integrated task system
-- **Personal Growth** - see your development journey
-
-### Learning & Development
-- **Writing Improvement** - AI helps expand vocabulary
-- **Habit Building** - consistent diary practice
-- **Pattern Recognition** - see your thought patterns
-- **Skill Development** - practice expressing yourself
-
-## 🚀 Getting Started
-
-Ready to begin your AI-enhanced journaling journey?
-
-1. **Extract YourDiary** from the ZIP file
-2. **Install dependencies** with `pip install flask numpy werkzeug`
-3. **Run the application** with `python app.py`
-4. **Create your account** and start writing
-5. **Watch your AI assistant learn** your unique style
-
-**Your personal AI writing companion awaits!**
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=flat&logo=react)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Bundler-Vite-646CFF?style=flat&logo=vite)](https://vitejs.dev)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=flat&logo=postgresql)](https://postgresql.org)
+[![SQLite](https://img.shields.io/badge/Dev%20DB-SQLite-003B57?style=flat&logo=sqlite)](https://sqlite.org)
 
 ---
 
-*YourDiary - Where Technology Meets Thoughtfulness* 💭✨
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🧠 **Personal AI** | Per-user LSTM neural network learns your writing style |
+| ✍️ **Smart Suggestions** | Real-time AI completions — short, medium, full sentence, or custom length |
+| 📔 **Diary Timeline** | Chronological view of all your entries with search |
+| ✅ **Task Management** | Convert diary thoughts into tasks with priorities and due dates |
+| 📊 **Stats Dashboard** | Track total, pending, completed, and overdue tasks at a glance |
+| 🔒 **JWT Auth** | Secure signup/login with hashed passwords and token-based sessions |
+| 🗄️ **Flexible Database** | SQLite for local dev, PostgreSQL (Supabase/Neon/Railway) for production |
+| 🚀 **Deployable** | FastAPI on Render + React on Vercel — fully decoupled |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────┐        ┌──────────────────────────┐
+│   React Frontend (Vite) │  HTTP  │   FastAPI Backend         │
+│   Vercel                │◄──────►│   Render                  │
+│                         │  JWT   │                           │
+│  /            Home      │        │  /api/auth/signup         │
+│  /diary       Timeline  │        │  /api/auth/login          │
+│  /tasks       Tasks     │        │  /api/diary/entry         │
+│  /entries     List      │        │  /api/diary/entries       │
+│  /login       Auth      │        │  /api/diary/suggestions   │
+│  /signup      Auth      │        │  /api/tasks  (CRUD)       │
+└─────────────────────────┘        └──────────┬───────────────┘
+                                              │ DATABASE_URL set?
+                                   ┌──────────▼───────────────┐
+                                   │  PostgreSQL (production)  │
+                                   │  Supabase / Neon /        │
+                                   │  Railway                  │
+                                   └──────────────────────────┘
+                                              │ No DATABASE_URL?
+                                   ┌──────────▼───────────────┐
+                                   │  SQLite  (local dev)      │
+                                   │  yourdiary.db             │
+                                   └──────────────────────────┘
+```
+
+---
+
+## 📁 Project Structure
+
+```
+Your_diary/
+├── app.py                   # FastAPI application — all routes & JWT auth
+├── requirements.txt         # Python dependencies
+├── render.yaml              # Render deployment config
+├── procfile                 # Start command
+├── .env.example             # Backend env variable template ← copy to .env
+├── base_model.npz           # Pre-trained LSTM weights (Sherlock Holmes corpus)
+├── yourdiary.db             # SQLite DB — auto-created when no DATABASE_URL set
+│
+├── models/
+│   ├── database.py          # DB layer: auto-detects SQLite or PostgreSQL
+│   └── lstm_model.py        # Custom LSTM neural network (pure NumPy)
+│
+└── frontend/
+    ├── index.html
+    ├── vercel.json          # Vercel SPA routing config
+    ├── vite.config.js       # Dev proxy → localhost:8000
+    ├── .env.example         # Frontend env variable template ← copy to .env.local
+    └── src/
+        ├── main.jsx
+        ├── App.jsx          # Routes (React Router)
+        ├── api.js           # Axios + JWT interceptor
+        ├── index.css        # Global dark design system
+        ├── context/
+        │   └── AuthContext.jsx
+        ├── components/
+        │   ├── Navbar.jsx
+        │   └── ProtectedRoute.jsx
+        └── pages/
+            ├── Login.jsx
+            ├── Signup.jsx
+            ├── Home.jsx     # Smart writing + AI suggestions
+            ├── Diary.jsx    # Entry timeline
+            ├── Tasks.jsx    # Task dashboard
+            └── Entries.jsx  # All entries list
+```
+
+---
+
+## 🚀 Local Setup
+
+### Prerequisites
+- Python 3.9+
+- Node.js 18+
+
+### 1. Clone & Configure Backend
+
+```bash
+git clone https://github.com/your-username/Your_diary.git
+cd Your_diary
+
+# Create your local env file
+cp .env.example .env
+# Edit .env — at minimum set SECRET_KEY (leave DATABASE_URL blank for SQLite)
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Start FastAPI
+uvicorn app:app --reload --port 8000
+```
+
+| URL | Description |
+|---|---|
+| `http://localhost:8000` | API base |
+| `http://localhost:8000/docs` | Swagger UI (auto-generated!) |
+| `http://localhost:8000/redoc` | ReDoc API reference |
+
+### 2. Configure & Start Frontend
+
+```bash
+cd frontend
+
+# Create local env file
+cp .env.example .env.local
+# .env.local already points to localhost:8000 — no changes needed for local dev
+
+# Install Node dependencies
+npm install
+
+# Start dev server
+npm run dev
+# → http://localhost:5173
+```
+
+> **Note:** Vite proxies all `/api` calls to `localhost:8000` in dev mode — no CORS configuration needed locally.
+
+---
+
+## 🔑 Environment Variables
+
+### Backend — `.env` (copy from `.env.example`)
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `SECRET_KEY` | ✅ **Yes** | `yourdiary-secret...` | JWT signing secret. **Must be changed in production.** Generate with: `openssl rand -hex 32` |
+| `ALLOWED_ORIGINS` | ✅ **Yes** | `http://localhost:5173` | Comma-separated CORS origins. Set to your Vercel URL in production. |
+| `DATABASE_URL` | ⬜ Optional | *(empty)* | PostgreSQL connection string. If empty, SQLite is used automatically. |
+
+**Example `.env`:**
+```env
+SECRET_KEY=a3f8c2e1d4b7a9f0e3c6b5d8a1f4e7c0b3d6a9f2e5c8b1d4a7f0e3c6b9d2a5
+ALLOWED_ORIGINS=https://yourdiary.vercel.app
+DATABASE_URL=postgresql://postgres.xxxx:mypass@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+```
+
+---
+
+### Frontend — `frontend/.env.local` (copy from `frontend/.env.example`)
+
+| Variable | Required | Description |
+|---|---|---|
+| `VITE_API_URL` | ✅ **Yes** | Base URL of the FastAPI backend. `http://localhost:8000` locally, your Render URL in production. |
+
+**Example `frontend/.env.local`:**
+```env
+# Local development
+VITE_API_URL=http://localhost:8000
+
+# Production (use Render URL)
+# VITE_API_URL=https://yourdiary-api.onrender.com
+```
+
+---
+
+## 🗄️ Database Setup
+
+### Option A — SQLite (Local Dev, Zero Config)
+
+Don't set `DATABASE_URL` in your `.env`. The app automatically creates and uses `yourdiary.db` in the project root. No installation or account needed.
+
+```env
+DATABASE_URL=   # leave blank
+```
+
+### Option B — PostgreSQL (Production, Persistent)
+
+SQLite on Render's free tier is **ephemeral** — the file is wiped on every redeploy. Use a hosted PostgreSQL database for persistent production data.
+
+#### 🟦 Supabase (Recommended — Free 500 MB)
+
+1. Go to [supabase.com](https://supabase.com) → **New Project**
+2. Choose a region and set a strong database password
+3. Go to **Project Settings → Database → Connection String → URI**
+4. Copy the **Session pooler** string (port `5432`)
+5. Replace `[YOUR-PASSWORD]` with your actual password
+6. Set it as `DATABASE_URL` on Render
+
+```env
+DATABASE_URL=postgresql://postgres.abcdef:yourpassword@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+```
+
+#### 🟢 Neon (Free 0.5 GB, Serverless)
+
+1. Go to [neon.tech](https://neon.tech) → **New Project**
+2. Copy the connection string from **Dashboard → Connection Details**
+3. Make sure it includes `?sslmode=require`
+
+```env
+DATABASE_URL=postgresql://user:password@ep-cool-darkness-123456.us-east-2.aws.neon.tech/neondb?sslmode=require
+```
+
+#### 🟣 Railway (PostgreSQL addon)
+
+1. Go to [railway.app](https://railway.app) → **New Project → Add PostgreSQL**
+2. Click the PostgreSQL service → **Variables** → copy `DATABASE_URL`
+
+```env
+DATABASE_URL=postgresql://postgres:password@containers-us-west-1.railway.app:5432/railway
+```
+
+> **How it works:** The database layer auto-detects the environment. If `DATABASE_URL` is set, it uses `psycopg2` to connect to PostgreSQL. If not, it uses the built-in `sqlite3` with a local file. No code changes needed between environments.
+
+---
+
+## 🌐 API Reference
+
+All protected routes require:
+```
+Authorization: Bearer <token>
+```
+
+### Auth
+
+| Method | Endpoint | Auth | Body | Description |
+|---|---|---|---|---|
+| `POST` | `/api/auth/signup` | — | `{username, password}` | Register new user |
+| `POST` | `/api/auth/login` | — | `{username, password}` | Login → JWT token |
+
+**Login response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiJ9...",
+  "token_type": "bearer",
+  "username": "john"
+}
+```
+
+### Diary
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/diary/entry` | ✅ | Save a diary entry |
+| `GET` | `/api/diary/entries` | ✅ | Get all entries (newest first) |
+| `POST` | `/api/diary/suggestions` | ✅ | Get AI writing completions |
+
+**Suggestion request:**
+```json
+{
+  "text": "Today I felt",
+  "max_length": 20,
+  "num_suggestions": 3
+}
+```
+> Set `"max_length": "sentence"` to generate text until the next period.
+
+### Tasks
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/tasks` | ✅ | Get all tasks + stats |
+| `POST` | `/api/tasks` | ✅ | Create a task |
+| `PATCH` | `/api/tasks/{id}/status` | ✅ | Update status |
+| `DELETE` | `/api/tasks/{id}` | ✅ | Delete task |
+
+---
+
+## 🧠 How the AI Works
+
+### Training & Personalization Pipeline
+
+```
+User writes entry
+      │
+      ▼
+Save entry to DB  ──────────────────────────────────────────────────────►  Diary entries table
+      │
+      ▼
+  entry_count % 3 == 0?
+      │  YES
+      ▼
+Spawn daemon thread (non-blocking)
+      │
+      ▼
+LSTM incremental training
+  - Join recent 10 entries into training text
+  - Run backprop on up to 10 sequences (seq_length=25)
+  - Gradient clipping applied
+      │
+      ▼
+Serialize weights → bytes (npz format, ~990 KB)
+      │
+      ├──► Save to DB  (user_models table — BLOB/BYTEA)  ← survives redeploys ✅
+      │
+      └──► Save to filesystem (yourdiary_users/user_X.npz) ← local dev fallback
+```
+
+### On Next Request (Weight Loading Priority)
+```
+1. Database BLOB  ─ exists? → load  (production, always up to date)
+2. Filesystem .npz ─ exists? → load  (local dev, or DB unavailable)
+3. Base model copy  ─ fallback for brand-new users
+```
+
+### Technical Details
+
+| Property | Value |
+|---|---|
+| Architecture | Single-layer LSTM, character-level |
+| Hidden size | 128 units |
+| Vocabulary | 89 characters (letters, punctuation, symbols) |
+| Base training | Sherlock Holmes corpus (`base_model.npz`) |
+| Per-user training | Incremental, every 3 diary entries |
+| Weight storage | `user_models` DB table (`BLOB`/`BYTEA`, ~990 KB per user) |
+| Training thread | Daemon thread — never blocks API responses |
+| Learning rate | 0.005 |
+| Gradient clipping | ±5 |
+
+### Why DB Storage Matters
+
+On **Render free tier**, the filesystem is **ephemeral** — all files in `yourdiary_users/` are wiped on every redeploy. Without DB storage, every user's personalization would be lost on each deployment.
+
+By serializing the LSTM weight matrices (`W_i`, `W_f`, `W_c`, `W_o`, `W_hy` and biases) to an npz blob and storing it in the database, personalization **persists permanently** regardless of server restarts or redeploys.
+
+
+---
+
+## 🚢 Deployment
+
+### Step 1 — Set Up PostgreSQL
+
+Pick a free provider (Supabase recommended) and get your `DATABASE_URL`. See [Database Setup](#️-database-setup) above.
+
+### Step 2 — Deploy Backend to Render
+
+1. Push repo to GitHub
+2. [render.com](https://render.com) → **New Web Service** → connect your repo
+3. Render reads `render.yaml` automatically, or set manually:
+   - **Build**: `pip install -r requirements.txt`
+   - **Start**: `uvicorn app:app --host 0.0.0.0 --port $PORT`
+4. Set **Environment Variables** on Render dashboard:
+
+| Variable | Value |
+|---|---|
+| `SECRET_KEY` | `openssl rand -hex 32` output |
+| `ALLOWED_ORIGINS` | Your Vercel URL (set after Step 3) |
+| `DATABASE_URL` | Your PostgreSQL connection string |
+
+5. Click **Deploy** — note your Render URL (e.g. `https://yourdiary-api.onrender.com`)
+
+### Step 3 — Deploy Frontend to Vercel
+
+1. [vercel.com](https://vercel.com) → **New Project** → import your repo
+2. Set **Root Directory** to `frontend`
+3. Add environment variable:
+
+| Variable | Value |
+|---|---|
+| `VITE_API_URL` | Your Render URL from Step 2 |
+
+4. Click **Deploy** — note your Vercel URL
+
+### Step 4 — Connect Both
+
+- Copy your **Vercel URL** → go back to Render → update `ALLOWED_ORIGINS` → redeploy
+- Done ✅
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+| Library | Purpose |
+|---|---|
+| [FastAPI](https://fastapi.tiangolo.com) | Web framework with auto Swagger docs |
+| [Uvicorn](https://www.uvicorn.org) | ASGI server |
+| [python-jose](https://github.com/mpdavis/python-jose) | JWT signing & verification |
+| [passlib + bcrypt](https://passlib.readthedocs.io) | Password hashing |
+| [psycopg2-binary](https://www.psycopg.org) | PostgreSQL adapter |
+| [NumPy](https://numpy.org) | LSTM neural network (no TensorFlow needed) |
+| SQLite / PostgreSQL | Database (auto-detected from environment) |
+
+### Frontend
+| Library | Purpose |
+|---|---|
+| [React 19](https://react.dev) | UI library |
+| [Vite](https://vitejs.dev) | Build tool with HMR |
+| [React Router v7](https://reactrouter.com) | Client-side routing |
+| [Axios](https://axios-http.com) | HTTP client with JWT interceptor |
+| Vanilla CSS | Custom dark design system |
+
+---
+
+## 📜 License
+
+MIT — feel free to use, modify, and distribute.
+
+---
+
+*YourDiary — Where Technology Meets Thoughtfulness 💭✨*

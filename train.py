@@ -24,7 +24,11 @@ import numpy as np
 import argparse
 import os
 import time
-from models.lstm_model import LSTM, voc
+
+try:
+    from models.lstm_model import LSTM, voc
+except ModuleNotFoundError:
+    from lstm_model import LSTM, voc
 
 
 # ─── Args ─────────────────────────────────────────────────────────────────────
@@ -45,7 +49,7 @@ def parse_args():
 
 # ─── Training loop ────────────────────────────────────────────────────────────
 
-def train(model, text, epochs, lr, seq_length, max_seqs):
+def train(model, text, epochs, lr, seq_length, max_seqs, save_every, output):
     """
     Full training loop with epoch tracking and loss reporting.
     Returns list of (epoch, loss) tuples.
@@ -107,6 +111,16 @@ def train(model, text, epochs, lr, seq_length, max_seqs):
 
         print(f"Epoch {epoch:>3}/{epochs}  loss: {avg_loss:.4f}  [{bar}]  ({elapsed:.1f}s){improved}")
 
+        if epoch % save_every == 0:
+            ckpt = output.replace(".npz", f"_epoch{epoch}.npz")
+            model.save_weights(ckpt)
+            print(f"💾 Checkpoint saved → {ckpt}")
+            try:
+                from IPython.display import display, FileLink
+                display(FileLink(ckpt))
+            except Exception:
+                pass
+
     return history
 
 
@@ -164,7 +178,7 @@ def main():
     print()
 
     # ── Train ────────────────────────────────────────────────────────────────
-    history = train(model, filtered, args.epochs, args.lr, args.seq, args.max_seqs)
+    history = train(model, filtered, args.epochs, args.lr, args.seq, args.max_seqs, args.save_every, args.output)
 
     if not history:
         return
